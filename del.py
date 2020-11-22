@@ -17,7 +17,7 @@ imap.login(username, password)
 
 imap.select("INBOX")
 
-status, messages = imap.search(None, 'ALL')
+status, messages = imap.search(None, 'FROM "[...]"')
 
 emails = messages[0].split(b' ')
 
