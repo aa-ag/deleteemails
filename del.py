@@ -1,4 +1,6 @@
 import imaplib
+import email
+from email.header import decode_header
 import datetime
 
 '''
@@ -6,23 +8,23 @@ Script to delete Gmail emails from inbox
 https://docs.python.org/3/library/imaplib.html
 '''
 
-inbox = imaplib.IMAP4_SSL('imap.gmail.com')
+username = "[...]"
+password = "[...]"
 
-print("{0} Connecting to mailbox via IMAP...".format(datetime.datetime.today().strftime("%Y-%m-%d %H:%M:%S")))
-inbox.login("[...]", "[...]")
+imap = imaplib.IMAP4_SSL("imap.gmail.com")
 
-inbox.select('[Gmail]/Promotions')
+imap.login(username, password)
 
-typ, data = inbox.search(None, 'ALL')
+imap.select("INBOX")
 
-inbox.select('[Gmail]/Trash')
+status, messages = imap.search(None, 'ALL')
 
-for num in data[0].split():
-    inbox.store(num, '+FLAGS', '\\Deleted')
+emails = messages[0].split(b' ')
 
-inbox.expunge()
+for email in emails:
+    _, msg = imap.fetch(email, "(RFC822)")
+    imap.store(email, "+FLAGS", "\\Deleted")
 
-inbox.close()
-inbox.logout()
-
-print('All done.')
+imap.expunge()
+imap.close()
+imap.logout()
